@@ -1,0 +1,9 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# build cache (vendored libs/fonts when rebuilding the offline file)
+furye_vendorcache/
+.vendorcache/
+*.log
