@@ -109,8 +109,8 @@ a { color: var(--accent); text-decoration: none; }
 .app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
 
 .sidebar {
-  width: var(--sidebar-w);
-  flex: 0 0 var(--sidebar-w);
+  width: var(--sb-w, var(--sidebar-w));
+  flex: 0 0 var(--sb-w, var(--sidebar-w));
   position: sticky; top: 0; align-self: flex-start;
   height: 100vh; overflow-y: auto;
   padding: 26px 18px 40px;
@@ -119,6 +119,16 @@ a { color: var(--accent); text-decoration: none; }
   backdrop-filter: blur(8px);
 }
 :root[data-mode="light"] .sidebar { background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(247,243,234,0.3)); }
+
+/* draggable handle to resize the sidebar (desktop only) */
+.sb-resizer { position: fixed; top: 0; height: 100vh; width: 9px; z-index: 20; cursor: col-resize; }
+.sb-resizer::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 3px; width: 1px;
+  background: var(--hair); transition: background .15s, box-shadow .15s, width .15s;
+}
+.sb-resizer:hover::before, .sb-resizer:active::before {
+  left: 2px; width: 2px; background: var(--accent); box-shadow: 0 0 9px var(--accent);
+}
 
 .sb-brand { display: block; margin-bottom: 4px; }
 .sb-brand .mark {
@@ -652,6 +662,7 @@ input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px 
   .sb-link.active { border-left: none; border-bottom-color: var(--accent); }
   .sb-link .done-dot { display: none; }
   .sb-group { display: none; }
+  .sb-resizer { display: none; }
   .mode-toggle { margin: 0 0 0 4px; flex: 0 0 auto; }
   .content { padding: 24px 16px 70px; }
   .sec-grid { grid-template-columns: 1fr; }

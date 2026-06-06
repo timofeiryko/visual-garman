@@ -2,7 +2,11 @@
    app.jsx — маршрутизация, навигация, KaTeX, прогресс
    ===================================================== */
 
-const ORDER = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8'];
+const ORDER = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8',
+  '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6'];
+const BLOCK_TITLES = { '1': 'Ряды Фурье', '2': 'Гильбертова теория' };
+const blockOf = (id) => (id && id.indexOf('.') > 0 ? id.split('.')[0] : '1');
+const blockHome = (id) => blockOf(id) + '.0';
 
 function parseRoute() {
   const h = (window.location.hash || '#map').slice(1);
@@ -14,6 +18,26 @@ function App() {
   const [mode, setMode] = useState('dark');
   const [visited, setVisited] = useState(() => new Set());
   const contentRef = useRef(null);
+
+  // resizable sidebar width (persisted; survives offline file:// via try/catch)
+  const [sbW, setSbW] = useState(() => {
+    try { const v = parseInt(localStorage.getItem('haGuideSidebarW'), 10); if (v >= 210 && v <= 620) return v; } catch (e) {}
+    return 280;
+  });
+  useEffect(() => { try { localStorage.setItem('haGuideSidebarW', String(sbW)); } catch (e) {} }, [sbW]);
+  const startSbDrag = (e) => {
+    e.preventDefault();
+    const startX = e.clientX, startW = sbW;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = (ev) => setSbW(Math.min(620, Math.max(210, startW + (ev.clientX - startX))));
+    const onUp = () => {
+      document.body.style.cursor = ''; document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
 
   useEffect(() => {
     const onHash = () => { setRoute(parseRoute()); window.scrollTo({ top: 0, behavior: 'auto' }); };
@@ -60,10 +84,11 @@ function App() {
     const pid = route.slice(6);
     const p = window.ALL_PROOFS[pid];
     view = <ProofPage id={pid} />;
+    const pb = p ? blockOf(p.sec) : '1';
     crumbs = (
       <div className="crumbs">
         <a href="#map">Карта курса</a><span className="sep">→</span>
-        <a href="#1.0">Блок 1 · Ряды Фурье</a><span className="sep">→</span>
+        <a href={`#${pb}.0`}>Блок {pb} · {BLOCK_TITLES[pb]}</a><span className="sep">→</span>
         {p ? <a href={`#${p.sec}`}>{window.CONTENT[p.sec] ? window.CONTENT[p.sec].num : p.sec} · {p.secTitle}</a> : null}<span className="sep">→</span>
         <span className="here">{p ? p.kicker : 'Доказательство'}</span>
       </div>
@@ -72,10 +97,11 @@ function App() {
     const Comp = SECTION_COMPONENTS[route];
     const c = CONTENT[route];
     view = <Comp />;
+    const cb = blockOf(route);
     crumbs = (
       <div className="crumbs">
         <a href="#map">Карта курса</a><span className="sep">→</span>
-        <a href="#1.0">Блок 1 · Ряды Фурье</a><span className="sep">→</span>
+        <a href={`#${cb}.0`}>Блок {cb} · {BLOCK_TITLES[cb]}</a><span className="sep">→</span>
         <span className="here">{c.ticket && c.ticket.startsWith('Билет') ? `${c.ticket} · ${c.title}` : `§${c.num} · ${c.title}`}</span>
       </div>
     );
@@ -115,10 +141,25 @@ function App() {
     );
   };
 
+  const shortKicker = (k) => k
+    .replace('Теорема ', 'Т').replace('Леммы ', 'Л').replace('Лемма ', 'Л')
+    .replace('Следствие ', 'Сл.').replace('Свойства ', 'С. ').replace('Полнота ↔ замкнутость', 'Замкнут.');
+  const ProofLinks = ({ block }) => (window.PROOF_ORDER || [])
+    .filter((pid) => window.ALL_PROOFS[pid] && blockOf(window.ALL_PROOFS[pid].sec) === block)
+    .map((pid) => {
+      const p = window.ALL_PROOFS[pid];
+      return (
+        <a className={`sb-sublink ${route === 'proof-' + pid ? 'active' : ''}`} href={`#proof-${pid}`} key={pid}>
+          <span className="pm">{shortKicker(p.kicker)}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
+        </a>
+      );
+    });
+
   return (
     <div className="app">
       <div className="paper-bg" />
-      <aside className="sidebar">
+      <aside className="sidebar" style={{ '--sb-w': sbW + 'px' }}>
         <a className="sb-brand" href="#map">
           <div className="mark">Гармонический анализ</div>
           <div className="sub">интерактивный гайд · v1</div>
@@ -129,23 +170,23 @@ function App() {
             Карта курса
           </a>
 
-          <div className="sb-group">§0 · До билетов</div>
-          {ORDER.slice(0, 2).map((id) => <NavLink key={id} id={id} />)}
+          <div className="sb-group">Блок 1 · §0 до билетов</div>
+          {['1.0', '1.1'].map((id) => <NavLink key={id} id={id} />)}
 
-          <div className="sb-group">Билеты 1–7</div>
-          {ORDER.slice(2).map((id) => <NavLink key={id} id={id} />)}
+          <div className="sb-group">Блок 1 · билеты 1–7</div>
+          {['1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8'].map((id) => <NavLink key={id} id={id} />)}
 
-          <div className="sb-group">Доказательства · по шагам</div>
-          {(window.PROOF_ORDER || []).map((pid) => {
-            const p = window.ALL_PROOFS[pid];
-            if (!p) return null;
-            return (
-              <a className={`sb-sublink ${route === 'proof-' + pid ? 'active' : ''}`} href={`#proof-${pid}`} key={pid}>
-                <span className="pm">{p.kicker.replace('Теорема ', 'Т').replace('Лемма ', 'Л').replace('Следствие ', 'Сл.').replace('Свойства ', 'С. ')}</span>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
-              </a>
-            );
-          })}
+          <div className="sb-group">Доказательства · блок 1</div>
+          <ProofLinks block="1" />
+
+          <div className="sb-group">Блок 2 · §0 до билетов</div>
+          {['2.0', '2.1'].map((id) => <NavLink key={id} id={id} />)}
+
+          <div className="sb-group">Блок 2 · билеты 8–12</div>
+          {['2.2', '2.3', '2.4', '2.5', '2.6'].map((id) => <NavLink key={id} id={id} />)}
+
+          <div className="sb-group">Доказательства · блок 2</div>
+          <ProofLinks block="2" />
 
           <div className="sb-group">Дальше — coming soon</div>
           {BLOCKS.filter(b => b.status === 'soon').map((b) => (
@@ -165,6 +206,9 @@ function App() {
           </div>
         </div>
       </aside>
+      <div className="sb-resizer" style={{ left: sbW - 3 }} onMouseDown={startSbDrag}
+        onDoubleClick={() => setSbW(280)} role="separator" aria-orientation="vertical"
+        title="Потяни, чтобы изменить ширину · двойной клик — сброс" />
 
       <main className="content" ref={contentRef}>
         {crumbs}
@@ -204,9 +248,9 @@ function App() {
                 <span className="lbl">{CONTENT[next].num} {CONTENT[next].title}</span>
               </a>
             ) : (
-              <a className="next" href="#teaser-2">
+              <a className="next" href="#teaser-3">
                 <span className="dir">Далее →</span>
-                <span className="lbl">Блок 2 · Гильбертова теория</span>
+                <span className="lbl">Блок 3 · Интегралы с параметром</span>
               </a>
             )}
           </div>

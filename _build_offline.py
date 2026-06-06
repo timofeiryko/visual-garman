@@ -58,9 +58,9 @@ index = (PROJ / "index.html").read_text(encoding="utf-8")
 tmpl = re.search(r'<template id="__bundler_thumbnail".*?</template>', index, re.S)
 thumbnail = tmpl.group(0) if tmpl else ""
 
-PLAIN = ["plot-utils.js", "fourier-math.js", "content.js", "proofs-a.js", "proofs-b.js"]
+PLAIN = ["plot-utils.js", "fourier-math.js", "content.js", "proofs-a.js", "proofs-b.js", "proofs-c.js"]
 JSX = ["viz-common.jsx", "viz-synthesis.jsx", "viz-winding.jsx", "viz-dirichlet.jsx",
-       "viz-misc.jsx", "sections.jsx", "proof-page.jsx", "coursemap.jsx", "app.jsx"]
+       "viz-misc.jsx", "viz-hilbert.jsx", "sections.jsx", "proof-page.jsx", "coursemap.jsx", "app.jsx"]
 def js_tag(fn, babel=False):
     code = (PROJ / "js" / fn).read_text(encoding="utf-8")
     return f"<!-- {fn} -->\n<script{' type=\"text/babel\"' if babel else ''}>\n{code}\n</script>"

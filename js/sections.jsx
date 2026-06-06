@@ -57,10 +57,20 @@ const Section_1_6 = () => <SectionLayout id="1.6" vizzes={[UniformVsPointwise]} 
 const Section_1_7 = () => <SectionLayout id="1.7" vizzes={[DirichletVsFejer, SnVsSigma]} />;
 const Section_1_8 = () => <SectionLayout id="1.8" vizzes={[WeierstrassChase]} />;
 
+const Section_2_0 = () => <SectionLayout id="2.0" vizzes={[ProjectionResidual]} />;
+const Section_2_1 = () => <SectionLayout id="2.1" vizzes={[InnerProductGeometry]} />;
+const Section_2_2 = () => <SectionLayout id="2.2" vizzes={[BesselClimb]} />;
+const Section_2_3 = () => <SectionLayout id="2.3" vizzes={[ParsevalGap]} />;
+const Section_2_4 = () => <SectionLayout id="2.4" vizzes={[RieszReconstruct]} />;
+const Section_2_5 = () => <SectionLayout id="2.5" vizzes={[MeanSquareConverge]} />;
+const Section_2_6 = () => <SectionLayout id="2.6" vizzes={[CompletenessHole]} />;
+
 const SECTION_COMPONENTS = {
   '1.0': Section_1_0, '1.1': Section_1_1, '1.2': Section_1_2,
   '1.3': Section_1_3, '1.4': Section_1_4, '1.5': Section_1_5,
   '1.6': Section_1_6, '1.7': Section_1_7, '1.8': Section_1_8,
+  '2.0': Section_2_0, '2.1': Section_2_1, '2.2': Section_2_2,
+  '2.3': Section_2_3, '2.4': Section_2_4, '2.5': Section_2_5, '2.6': Section_2_6,
 };
 
 Object.assign(window, { SectionLayout, SECTION_COMPONENTS });

@@ -92,7 +92,7 @@ function CourseMap({ visited }) {
       <div className="map-blocks">
         {BLOCKS.map((b, i) => {
           const active = b.status === 'active';
-          const href = active ? '#1.0' : `#teaser-${b.n}`;
+          const href = active ? `#${b.n}.0` : `#teaser-${b.n}`;
           return (
             <a className={`map-block ${active ? 'active' : 'soon'} rise`} href={href} key={b.n} style={{ animationDelay: `${0.12 + i * 0.05}s` }}>
               <div className="bnum">{b.n}</div>
@@ -113,6 +113,17 @@ function CourseMap({ visited }) {
         <div className="sb-group" style={{ margin: '0 0 12px' }}>Блок 1 · §0 (до билетов) + билеты 1–7</div>
         <div className="map-sub">
           {SUBSECTIONS.map((s) => (
+            <a href={`#${s.id}`} key={s.id} className="rise" style={{ animationDelay: '.1s' }}>
+              {visited && visited.has(s.id) ? <span className="done-dot" /> : null}
+              <div className="ssnum">{s.num}</div>
+              <div className="sstitle" dangerouslySetInnerHTML={{ __html: s.title }} />
+              <div className="ssticket">{s.ticket}</div>
+            </a>
+          ))}
+        </div>
+        <div className="sb-group" style={{ margin: '22px 0 12px' }}>Блок 2 · §0 (до билетов) + билеты 8–12</div>
+        <div className="map-sub">
+          {(window.SUBSECTIONS_2 || []).map((s) => (
             <a href={`#${s.id}`} key={s.id} className="rise" style={{ animationDelay: '.1s' }}>
               {visited && visited.has(s.id) ? <span className="done-dot" /> : null}
               <div className="ssnum">{s.num}</div>
