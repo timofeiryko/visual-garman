@@ -132,6 +132,12 @@ function CourseMap({ visited }) {
             </a>
           ))}
         </div>
+        {[3,4,5].map(b=><React.Fragment key={b}>
+          <div className="sb-group" style={{margin:'22px 0 12px'}}>Блок {b} · {BLOCKS.find(x=>x.n===b).title}</div>
+          <div className="map-sub">{SUBSECTIONS_EXTRA.filter(s=>s.id.startsWith(b+'.')).map(s=><a href={'#'+s.id} key={s.id}><div className="ssnum">{s.num}</div><div className="sstitle">{s.title}</div><div className="ssticket">{s.ticket}</div></a>)}</div>
+        </React.Fragment>)}
+        <p className="map-lede">Все 20 билетов открыты. Первый проход: определения → условия → вывод → короткая проверка памяти. Дополнения сверены с конспектом лектора; примеры и интерактивы поясняют формулы.</p>
+        <p><a href="гайд_оффлайн.html" download>Скачать весь гайд для работы без интернета</a></p>
       </div>
     </div>
   );

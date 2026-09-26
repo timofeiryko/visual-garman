@@ -58,9 +58,9 @@ index = (PROJ / "index.html").read_text(encoding="utf-8")
 tmpl = re.search(r'<template id="__bundler_thumbnail".*?</template>', index, re.S)
 thumbnail = tmpl.group(0) if tmpl else ""
 
-PLAIN = ["plot-utils.js", "fourier-math.js", "content.js", "proofs-a.js", "proofs-b.js", "proofs-c.js"]
+PLAIN = ["plot-utils.js", "fourier-math.js", "content.js", "proofs-a.js", "proofs-b.js", "proofs-c.js", "content-extra.js", "proofs-extra.js"]
 JSX = ["viz-common.jsx", "viz-synthesis.jsx", "viz-winding.jsx", "viz-dirichlet.jsx",
-       "viz-misc.jsx", "viz-hilbert.jsx", "sections.jsx", "proof-page.jsx", "coursemap.jsx", "app.jsx"]
+       "viz-misc.jsx", "viz-hilbert.jsx", "sections.jsx", "viz-extra.jsx", "proof-page.jsx", "coursemap.jsx", "app.jsx"]
 def js_tag(fn, babel=False):
     code = (PROJ / "js" / fn).read_text(encoding="utf-8")
     return f"<!-- {fn} -->\n<script{' type=\"text/babel\"' if babel else ''}>\n{code}\n</script>"
@@ -79,7 +79,7 @@ for fn in JSX:   p.append(js_tag(fn, True))
 p.append(thumbnail); p.append("</body>\n</html>")
 html = "\n".join(p)
 
-(PROJ / "гайд_оффлайн.html").write_text(html, encoding="utf-8")
+(PROJ / "гайд_оффлайн.html").write_text(html, encoding="utf-8", newline="\n")
 n = len(html.encode("utf-8"))
 nethits = re.findall(r'(?:src|href)\s*=\s*["\']https?://', html) + re.findall(r'url\(https?://', html)
 print(f"OK: {n} bytes ({n//1024//1024}MB), network refs remaining: {len(nethits)}")

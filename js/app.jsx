@@ -3,8 +3,8 @@
    ===================================================== */
 
 const ORDER = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8',
-  '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6'];
-const BLOCK_TITLES = { '1': 'Ряды Фурье', '2': 'Гильбертова теория' };
+  '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', ...SUBSECTIONS_EXTRA.map(s => s.id)];
+const BLOCK_TITLES = { '1': 'Ряды Фурье', '2': 'Гильбертова теория', '3':'Интегралы с параметром', '4':'Преобразование Фурье', '5':'Обобщённые функции' };
 const blockOf = (id) => (id && id.indexOf('.') > 0 ? id.split('.')[0] : '1');
 const blockHome = (id) => blockOf(id) + '.0';
 
@@ -78,7 +78,9 @@ function App() {
     crumbs = null;
   } else if (route.startsWith('teaser-')) {
     const b = parseInt(route.split('-')[1], 10);
-    view = <TeaserPage block={b} />;
+    const id = b + '.0';
+    const Comp = SECTION_COMPONENTS[id];
+    view = Comp ? <Comp key={id} /> : <CourseMap visited={visited} />;
     crumbs = <div className="crumbs"><a href="#map">Карта курса</a><span className="sep">→</span><span className="here">Блок {b}</span></div>;
   } else if (route.startsWith('proof-')) {
     const pid = route.slice(6);
@@ -96,7 +98,7 @@ function App() {
   } else if (SECTION_COMPONENTS[route]) {
     const Comp = SECTION_COMPONENTS[route];
     const c = CONTENT[route];
-    view = <Comp />;
+    view = <Comp key={route} />;
     const cb = blockOf(route);
     crumbs = (
       <div className="crumbs">
@@ -162,7 +164,7 @@ function App() {
       <aside className="sidebar" style={{ '--sb-w': sbW + 'px' }}>
         <a className="sb-brand" href="#map">
           <div className="mark">Гармонический анализ</div>
-          <div className="sub">интерактивный гайд · v1</div>
+          <div className="sub">интерактивный гайд · все 20 билетов</div>
         </a>
         <div className="sb-links">
           <a className={`sb-home ${route === 'map' ? 'active' : ''}`} href="#map">
@@ -188,14 +190,11 @@ function App() {
           <div className="sb-group">Доказательства · блок 2</div>
           <ProofLinks block="2" />
 
-          <div className="sb-group">Дальше — coming soon</div>
-          {BLOCKS.filter(b => b.status === 'soon').map((b) => (
-            <a className="sb-link sb-soft" href={`#teaser-${b.n}`} key={b.n}>
-              <span className="num">{b.n}</span>
-              <span>{b.title}</span>
-              <span className="soon">soon</span>
-            </a>
-          ))}
+          {['3','4','5'].map(block => <React.Fragment key={block}>
+            <div className="sb-group">Блок {block} · {BLOCK_TITLES[block]}</div>
+            {SUBSECTIONS_EXTRA.filter(s=>s.id.startsWith(block+'.')).map(s=><NavLink key={s.id} id={s.id}/>)}
+            <ProofLinks block={block}/>
+          </React.Fragment>)}
 
           <div className="mode-toggle" role="button" tabIndex={0}
             onClick={() => setMode((m) => m === 'dark' ? 'light' : 'dark')}
@@ -210,7 +209,7 @@ function App() {
         onDoubleClick={() => setSbW(280)} role="separator" aria-orientation="vertical"
         title="Потяни, чтобы изменить ширину · двойной клик — сброс" />
 
-      <main className="content" ref={contentRef}>
+      <main className="content" ref={contentRef} key={route}>
         {crumbs}
         {view}
         {isProof && (proofPrev || proofNext) && (
@@ -248,9 +247,9 @@ function App() {
                 <span className="lbl">{CONTENT[next].num} {CONTENT[next].title}</span>
               </a>
             ) : (
-              <a className="next" href="#teaser-3">
-                <span className="dir">Далее →</span>
-                <span className="lbl">Блок 3 · Интегралы с параметром</span>
+              <a className="next" href="#map">
+                <span className="dir">Курс пройден →</span>
+                <span className="lbl">Карта курса · повторение</span>
               </a>
             )}
           </div>
